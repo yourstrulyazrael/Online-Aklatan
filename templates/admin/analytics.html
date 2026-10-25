@@ -1,0 +1,54 @@
+{% extends "admin/base.html" %}
+{% block title %}Book Analytics · Admin{% endblock %}
+{% block content %}
+<div class="admin-top">
+  <h1>Book analytics</h1>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+    <label for="book-select" class="sr-only">Book</label>
+    <select id="book-select" style="width:auto;max-width:280px;border-radius:999px"></select>
+    <div class="seg" id="range" role="group" aria-label="Date range">
+      <button data-days="30" class="active">30 days</button>
+      <button data-days="90">90 days</button>
+    </div>
+  </div>
+</div>
+
+<section class="card">
+  <div class="analytics-head" id="book-head"></div>
+</section>
+
+<div class="kpis" id="book-kpis" style="margin-top:16px"></div>
+
+<div class="dash-grid">
+  <section class="card">
+    <div class="card-head"><h2>Units sold per day</h2><span class="muted small" id="units-caption"></span></div>
+    <div class="chart-box"><canvas id="units-chart" role="img" aria-label="Units sold per day"></canvas></div>
+  </section>
+  <section class="card">
+    <div class="card-head"><h2>Stock level</h2></div>
+    <div class="chart-box"><canvas id="stock-chart" role="img" aria-label="Stock level over time"></canvas></div>
+  </section>
+</div>
+
+<div class="dash-grid" style="margin-top:16px">
+  <section class="card">
+    <div class="card-head"><h2>Restock history</h2><button class="btn btn-ghost btn-sm" id="restock-link">Restock</button></div>
+    <div class="table-wrap"><table class="data" id="restock-table"></table></div>
+  </section>
+  <section class="card">
+    <div class="card-head"><h2>Reviews</h2><span id="rating-summary"></span></div>
+    <div id="rating-bars"></div>
+  </section>
+</div>
+
+<section class="card" style="margin-top:16px">
+  <div class="card-head">
+    <div><h2>All books performance</h2><p class="muted small" style="margin:0">Select a row to inspect that book · selected period</p></div>
+    <button class="btn btn-ghost btn-sm" id="export-perf">⬇ Export CSV</button>
+  </div>
+  <div class="table-wrap"><table class="data" id="perf-table"></table></div>
+</section>
+{% endblock %}
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/admin/analytics.js') }}"></script>
+{% endblock %}

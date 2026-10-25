@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Wishlist · Online Aklatan{% endblock %}
+{% block content %}
+<h1>Wishlist</h1>
+<div class="book-grid" id="wish-grid"></div>
+{% endblock %}
+{% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const grid = document.getElementById("wish-grid");
+    async function render() {
+      let list;
+      try { list = await Store.wishlist(); } catch (err) { UI.handleError(err); return; }
+      grid.innerHTML = list.length ? list.map(UI.bookCard).join("")
+        : `<div class="card empty" style="grid-column:1/-1"><div class="empty-icon">♡</div><h2>No saved books yet</h2><p>Tap the heart on any book to save it here.</p><a class="btn btn-primary" href="/">Browse books</a></div>`;
+    }
+    UI.bindCardActions(grid, render);
+    UI.loading(grid);
+    render();
+  });
+</script>
+{% endblock %}

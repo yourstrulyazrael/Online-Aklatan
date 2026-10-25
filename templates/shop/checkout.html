@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Checkout · Online Aklatan{% endblock %}
+{% block content %}
+<div class="steps" aria-label="Checkout progress">
+  <span class="done"><b>✓</b> Cart</span><i></i>
+  <span class="current"><b>2</b> Details &amp; payment</span><i></i>
+  <span><b>3</b> Confirmation</span>
+</div>
+<h1>Checkout</h1>
+
+<form id="checkout-form" novalidate>
+  <div class="two-col">
+    <div>
+      <section class="card">
+        <h2>Delivery details</h2>
+        <div class="grid-2">
+          <div class="field"><label for="c-name">Full name</label><input id="c-name" name="name" autocomplete="name" required><div class="field-error"></div></div>
+          <div class="field"><label for="c-email">Email</label><input id="c-email" name="email" type="email" autocomplete="email" required><div class="field-error"></div></div>
+        </div>
+        <div class="grid-2">
+          <div class="field"><label for="c-phone">Mobile number</label><input id="c-phone" name="phone" inputmode="numeric" placeholder="09XXXXXXXXX" autocomplete="tel" required><div class="field-error"></div></div>
+          <div class="field"><label for="c-city">City</label><input id="c-city" name="city" autocomplete="address-level2" required><div class="field-error"></div></div>
+        </div>
+        <div class="field"><label for="c-address">Street address</label><input id="c-address" name="address" autocomplete="street-address" placeholder="House no., street, barangay" required><div class="field-error"></div></div>
+        <div class="field"><label for="c-notes">Delivery notes <span class="muted">(optional)</span></label><input id="c-notes" name="notes" placeholder="e.g. Leave at the guardhouse"></div>
+      </section>
+
+      <section class="card">
+        <h2>Payment method</h2>
+        <div class="pay-options" role="radiogroup" aria-label="Payment method">
+          <div class="pay-option">
+            <input type="radio" name="method" id="pm-cash" value="cash" checked>
+            <label for="pm-cash"><span class="pay-icon">💵</span>Cash on Delivery<small>Pay when your books arrive</small></label>
+          </div>
+          <div class="pay-option">
+            <input type="radio" name="method" id="pm-ewallet" value="ewallet">
+            <label for="pm-ewallet"><span class="pay-icon">📱</span>E-Wallet<small>GCash, Maya, GrabPay</small></label>
+          </div>
+          <div class="pay-option">
+            <input type="radio" name="method" id="pm-card" value="card">
+            <label for="pm-card"><span class="pay-icon">💳</span>Credit / Debit Card<small>Visa, Mastercard</small></label>
+          </div>
+        </div>
+
+        <div class="pay-panel" data-panel="cash">
+          <p style="margin-top:0">Pay the rider in cash upon delivery. Please prepare the exact amount if possible.</p>
+          <div class="field" style="margin:0">
+            <label for="cash-change">Need change for? <span class="muted">(optional)</span></label>
+            <input id="cash-change" type="number" min="0" step="50" placeholder="e.g. 1000">
+            <div class="field-error"></div>
+          </div>
+        </div>
+
+        <div class="pay-panel" data-panel="ewallet" hidden>
+          <div class="wallets" role="radiogroup" aria-label="E-wallet provider">
+            <button type="button" class="wallet-btn active" data-wallet="GCash">GCash</button>
+            <button type="button" class="wallet-btn" data-wallet="Maya">Maya</button>
+            <button type="button" class="wallet-btn" data-wallet="GrabPay">GrabPay</button>
+          </div>
+          <div class="field" style="margin:0">
+            <label for="ew-number"><span id="ew-name">GCash</span> account number</label>
+            <input id="ew-number" inputmode="numeric" placeholder="09XXXXXXXXX" maxlength="11">
+            <div class="field-error"></div>
+          </div>
+          <p class="small muted" style="margin:.8em 0 0">You'll be asked to authorize the payment with a one-time PIN.</p>
+        </div>
+
+        <div class="pay-panel" data-panel="card" hidden>
+          <div class="card-preview" aria-hidden="true">
+            <div class="cp-row"><span class="cp-chip"></span><span id="cp-brand"></span></div>
+            <div class="cp-number" id="cp-number">•••• •••• •••• ••••</div>
+            <div class="cp-row"><span id="cp-name">CARDHOLDER NAME</span><span id="cp-exp">MM/YY</span></div>
+          </div>
+          <div class="field">
+            <label for="card-number">Card number</label>
+            <div class="card-input"><input id="card-number" inputmode="numeric" autocomplete="cc-number" placeholder="1234 5678 9012 3456" maxlength="23"><span class="card-brand" id="card-brand"></span></div>
+            <div class="field-error"></div>
+          </div>
+          <div class="field">
+            <label for="card-name">Name on card</label>
+            <input id="card-name" autocomplete="cc-name">
+            <div class="field-error"></div>
+          </div>
+          <div class="grid-2">
+            <div class="field"><label for="card-exp">Expiry</label><input id="card-exp" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/YY" maxlength="5"><div class="field-error"></div></div>
+            <div class="field"><label for="card-cvv">CVV</label><input id="card-cvv" inputmode="numeric" autocomplete="cc-csc" placeholder="123" maxlength="4"><div class="field-error"></div></div>
+          </div>
+          <p class="small muted" style="margin:0">🔒 Demo only — card details are validated in the browser and never stored. Try <code>4242 4242 4242 4242</code>.</p>
+        </div>
+      </section>
+    </div>
+
+    <aside class="card summary" id="summary"></aside>
+  </div>
+</form>
+
+<div class="modal" id="otp-modal" hidden>
+  <div class="modal-card modal-sm" role="dialog" aria-modal="true" aria-labelledby="otp-title">
+    <div class="modal-head"><h2 id="otp-title">Authorize payment</h2><button class="icon-btn modal-close" data-close aria-label="Close">✕</button></div>
+    <p>We sent a 6-digit code to <strong id="otp-number"></strong> via <span id="otp-wallet"></span>.</p>
+    <p class="small muted">Demo code: <code id="otp-demo"></code></p>
+    <form id="otp-form">
+      <div class="field"><label for="otp">One-time PIN</label><input id="otp" inputmode="numeric" maxlength="6" autocomplete="one-time-code"><div class="field-error"></div></div>
+      <button class="btn btn-primary btn-block" type="submit">Confirm payment</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/shop/checkout.js') }}"></script>
+{% endblock %}

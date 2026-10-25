@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Database unavailable · Online Aklatan</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <main>
+    <div class="container">
+      <div class="card empty" style="max-width:640px;margin:48px auto;text-align:left">
+        <div class="empty-icon">🛢️</div>
+        <h1>Can't reach the database</h1>
+        <p>The store couldn't connect to MySQL at <code>{{ target }}</code>.</p>
+        <ol>
+          <li>Start MySQL — in XAMPP, open the Control Panel and click <strong>Start</strong> next to MySQL.</li>
+          <li>Check the <code>DB_*</code> values in <code>.env</code>.</li>
+          <li>Create the tables: <code>python migrate.py</code></li>
+        </ol>
+        <p class="small muted">Details: {{ error }}</p>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

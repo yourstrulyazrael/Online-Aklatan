@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Shop · Online Aklatan{% endblock %}
+{% block full_width %}
+<section class="hero">
+  <div class="container hero-inner">
+    <div>
+      <span class="hero-eyebrow">✦ Free delivery on orders over ₱{{ "{:,}".format(config.FREE_SHIPPING_MIN) }}</span>
+      <h1>Find your next <em>favorite read.</em></h1>
+      <p>Classics, bestsellers and hidden gems — delivered to your door. Pay the way you like: cash on delivery, e-wallet, or card.</p>
+      <div class="hero-actions">
+        <a class="btn" href="#catalog">Browse books</a>
+        <a class="btn btn-outline" href="?genre=Classics#catalog">Explore classics</a>
+      </div>
+      <div class="promo-strip">
+        <span class="promo-chip">BOOKWORM10 · 10% off</span>
+        <span class="promo-chip">FREESHIP · free delivery</span>
+      </div>
+    </div>
+    <div class="hero-books" id="hero-books" aria-hidden="true"></div>
+  </div>
+</section>
+{% endblock %}
+{% block content %}
+<div class="shop-layout" id="catalog">
+  <aside class="filters card">
+    <h3>Genre</h3>
+    <div class="chip-list" id="genre-list"></div>
+    <h3>Price</h3>
+    <div class="field">
+      <label for="max-price">Up to <span id="max-price-label"></span></label>
+      <input type="range" id="max-price" min="0" step="50">
+    </div>
+    <h3>Availability</h3>
+    <label class="check"><input type="checkbox" id="in-stock"> In stock only</label>
+  </aside>
+
+  <section>
+    <div class="toolbar">
+      <div class="search">
+        <label for="q" class="sr-only">Search books</label>
+        <input type="search" id="q" placeholder="Search by title, author or ISBN…">
+      </div>
+      <label for="sort" class="sr-only">Sort by</label>
+      <select id="sort">
+        <option value="popular">Most popular</option>
+        <option value="rating">Top rated</option>
+        <option value="newest">Newest</option>
+        <option value="price-asc">Price: low to high</option>
+        <option value="price-desc">Price: high to low</option>
+        <option value="title">Title A–Z</option>
+      </select>
+    </div>
+    <p class="result-count" id="result-count"></p>
+    <div class="book-grid" id="book-grid"></div>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/shop/catalog.js') }}"></script>
+{% endblock %}

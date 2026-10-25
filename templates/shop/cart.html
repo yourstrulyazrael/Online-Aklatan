@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Cart · Online Aklatan{% endblock %}
+{% block content %}
+<h1>Your cart</h1>
+<div id="cart-root"></div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/shop/cart.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Admin · Online Aklatan{% endblock %}
+{% block head %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+{% endblock %}
+{% block layout %}
+<div class="admin-shell">
+  <aside class="side-nav">
+    <a class="brand" href="{{ url_for('admin_dashboard') }}"><span class="brand-mark">📖</span> Admin</a>
+    <nav aria-label="Admin">
+      <a href="{{ url_for('admin_dashboard') }}">📊 Dashboard</a>
+      <a href="{{ url_for('admin_books') }}">📚 Inventory</a>
+      <a href="{{ url_for('admin_analytics') }}">📈 Book Analytics</a>
+      <a href="{{ url_for('admin_orders') }}">🧾 Orders</a>
+    </nav>
+    <div class="side-foot">
+      <a class="btn btn-ghost btn-sm" href="{{ url_for('index') }}">← View storefront</a>
+      <button class="btn btn-ghost btn-sm" type="button" data-theme-toggle>◐ Toggle theme</button>
+      <button class="btn btn-ghost btn-sm" type="button" data-logout>Log out</button>
+    </div>
+  </aside>
+  <div class="admin-content">
+    <nav class="mobile-nav" aria-label="Admin">
+      <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('admin_books') }}">Inventory</a>
+      <a href="{{ url_for('admin_analytics') }}">Analytics</a>
+      <a href="{{ url_for('admin_orders') }}">Orders</a>
+      <a href="{{ url_for('index') }}">Store</a>
+    </nav>
+    <main class="admin-main">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/admin/charts.js') }}"></script>
+{% block page_scripts %}{% endblock %}
+{% endblock %}

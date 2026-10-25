@@ -1,0 +1,54 @@
+{% extends "admin/base.html" %}
+{% block title %}Dashboard · Admin{% endblock %}
+{% block content %}
+<div class="admin-top">
+  <div>
+    <h1>Dashboard</h1>
+    <p class="muted" style="margin:0" id="greeting"></p>
+  </div>
+  <div class="seg" id="range" role="group" aria-label="Date range">
+    <button data-days="7">7 days</button>
+    <button data-days="30" class="active">30 days</button>
+    <button data-days="90">90 days</button>
+  </div>
+</div>
+
+<div class="kpis" id="kpis"></div>
+
+<div class="dash-grid">
+  <section class="card">
+    <div class="card-head"><h2>Revenue</h2><span class="muted small" id="rev-caption"></span></div>
+    <div class="chart-box"><canvas id="rev-chart" aria-label="Daily revenue chart" role="img"></canvas></div>
+  </section>
+  <section class="card">
+    <div class="card-head"><h2>Payment methods</h2></div>
+    <div class="chart-box short"><canvas id="pay-chart" aria-label="Revenue by payment method" role="img"></canvas></div>
+    <div id="pay-table" style="margin-top:10px"></div>
+  </section>
+</div>
+
+<div class="dash-grid" style="margin-top:16px">
+  <section class="card">
+    <div class="card-head"><h2>Sales by genre</h2><span class="muted small">Units sold</span></div>
+    <div class="chart-box short"><canvas id="genre-chart" aria-label="Units sold by genre" role="img"></canvas></div>
+  </section>
+  <section class="card">
+    <div class="card-head"><h2>Top sellers</h2><a class="small" href="/admin/analytics">All analytics →</a></div>
+    <ol class="rank-list" id="top-sellers"></ol>
+  </section>
+</div>
+
+<div class="dash-grid" style="margin-top:16px">
+  <section class="card">
+    <div class="card-head"><h2>Recent orders</h2><a class="small" href="/admin/orders">View all →</a></div>
+    <div class="table-wrap"><table class="data" id="recent-orders"></table></div>
+  </section>
+  <section class="card">
+    <div class="card-head"><h2>Stock alerts</h2><a class="small" href="/admin/books?stock=low">Manage →</a></div>
+    <ul class="rank-list alert-list" id="stock-alerts"></ul>
+  </section>
+</div>
+{% endblock %}
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/admin/dashboard.js') }}"></script>
+{% endblock %}

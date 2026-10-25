@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Sign in · Online Aklatan{% endblock %}
+{% block full_width %}
+<div class="auth-page">
+  <section class="auth-art" aria-hidden="true">
+    <div class="auth-wall" id="auth-wall"></div>
+    <h2>Every page, a new world.</h2>
+    <p>Sign in to build your cart, save books to your wishlist, and track every order from checkout to your doorstep.</p>
+  </section>
+
+  <section class="auth-form">
+    <div class="auth-wrap">
+      <div class="card">
+        <div class="tabs" role="tablist">
+          <button class="active" data-tab="login" role="tab">Log in</button>
+          <button data-tab="register" role="tab">Create account</button>
+        </div>
+
+        <form id="login-form" data-pane="login">
+          <h1 style="font-size:1.5rem">Welcome back</h1>
+          <div class="field"><label for="l-email">Email</label><input id="l-email" type="email" autocomplete="email" required></div>
+          <div class="field"><label for="l-pass">Password</label><input id="l-pass" type="password" autocomplete="current-password" required></div>
+          <p class="field-error" id="login-error"></p>
+          <button class="btn btn-primary btn-block" type="submit">Log in</button>
+          <div class="demo-box">
+            <strong>Demo accounts</strong><br>
+            Admin: <code>admin@bookstore.com</code> / <code>admin123</code> <button type="button" class="link-btn" data-fill="admin@bookstore.com|admin123">use</button><br>
+            Customer: <code>juan@mail.com</code> / <code>juan123</code> <button type="button" class="link-btn" data-fill="juan@mail.com|juan123">use</button>
+          </div>
+        </form>
+
+        <form id="register-form" data-pane="register" hidden>
+          <h1 style="font-size:1.5rem">Create your account</h1>
+          <div class="field"><label for="r-name">Full name</label><input id="r-name" autocomplete="name" required></div>
+          <div class="field"><label for="r-email">Email</label><input id="r-email" type="email" autocomplete="email" required></div>
+          <div class="field"><label for="r-pass">Password</label><input id="r-pass" type="password" autocomplete="new-password" minlength="6" required></div>
+          <div class="field"><label for="r-pass2">Confirm password</label><input id="r-pass2" type="password" autocomplete="new-password" required></div>
+          <p class="field-error" id="register-error"></p>
+          <button class="btn btn-primary btn-block" type="submit">Create account</button>
+        </form>
+      </div>
+      <p class="small muted" style="text-align:center;margin-top:14px"><a href="{{ url_for('index') }}">← Keep browsing</a></p>
+    </div>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const { $, $$ } = UI;
+    const params = new URLSearchParams(location.search);
+    const next = params.get("next");
+
+    function go(user) {
+      let dest = next && next.startsWith("/") && !next.startsWith("//") ? next : (user.role === "admin" ? "/admin" : "/");
+      if (dest.startsWith("/admin") && user.role !== "admin") dest = "/";
+      location.href = dest;
+    }
+
+    function showTab(name) {
+      $$("[data-tab]").forEach((x) => x.classList.toggle("active", x.dataset.tab === name));
+      $$("[data-pane]").forEach((p) => (p.hidden = p.dataset.pane !== name));
+    }
+    $$("[data-tab]").forEach((t) => t.addEventListener("click", () => showTab(t.dataset.tab)));
+    if (params.get("tab") === "register") showTab("register");
+
+    $$("[data-fill]").forEach((b) => b.addEventListener("click", () => {
+      const [email, pass] = b.dataset.fill.split("|");
+      $("#l-email").value = email;
+      $("#l-pass").value = pass;
+    }));
+
+    async function submit(form, errEl, action) {
+      const btn = form.querySelector("[type=submit]");
+      btn.disabled = true;
+      errEl.textContent = "";
+      try { go(await action()); }
+      catch (err) { errEl.textContent = err.message; btn.disabled = false; }
+    }
+    $("#login-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      submit(e.target, $("#login-error"), () => Store.login($("#l-email").value, $("#l-pass").value));
+    });
+    $("#register-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const err = $("#register-error");
+      if ($("#r-pass").value.length < 6) { err.textContent = "Password must be at least 6 characters."; return; }
+      if ($("#r-pass").value !== $("#r-pass2").value) { err.textContent = "Passwords don't match."; return; }
+      submit(e.target, err, () => Store.register({ name: $("#r-name").value, email: $("#r-email").value, password: $("#r-pass").value }));
+    });
+
+    Store.books().then((books) => {
+      const wall = [...books, ...books].slice(0, 25);
+      $("#auth-wall").innerHTML = wall.map((b) => UI.cover(b)).join("");
+    }).catch(() => {});
+  });
+</script>
+{% endblock %}

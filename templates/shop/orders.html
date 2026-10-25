@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}My orders · Online Aklatan{% endblock %}
+{% block content %}
+<div class="card-head"><h1 style="margin:0">My orders</h1>
+  <div class="seg" id="order-filter">
+    <button class="active" data-f="all">All</button>
+    <button data-f="active">Active</button>
+    <button data-f="Delivered">Delivered</button>
+    <button data-f="Cancelled">Cancelled</button>
+  </div>
+</div>
+<div id="orders-root" style="margin-top:16px"></div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/shop/order.js') }}"></script>
+<script src="{{ url_for('static', filename='js/shop/orders.js') }}"></script>
+{% endblock %}

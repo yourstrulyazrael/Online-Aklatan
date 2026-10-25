@@ -1,0 +1,46 @@
+{% extends "admin/base.html" %}
+{% block title %}Orders · Admin{% endblock %}
+{% block content %}
+<div class="admin-top">
+  <div><h1>Orders</h1><p class="muted" style="margin:0" id="orders-summary"></p></div>
+  <button class="btn btn-ghost" id="export-orders">⬇ Export CSV</button>
+</div>
+
+<section class="card">
+  <div class="toolbar">
+    <div class="search"><label for="o-q" class="sr-only">Search orders</label><input type="search" id="o-q" placeholder="Search order #, customer, book…"></div>
+    <label for="o-status" class="sr-only">Status</label>
+    <select id="o-status">
+      <option value="">All statuses</option>
+      <option>Pending</option><option>Processing</option><option>Shipped</option><option>Delivered</option><option>Cancelled</option>
+    </select>
+    <label for="o-method" class="sr-only">Payment method</label>
+    <select id="o-method">
+      <option value="">All payments</option>
+      <option value="cash">Cash on Delivery</option>
+      <option value="ewallet">E-Wallet</option>
+      <option value="card">Card</option>
+    </select>
+  </div>
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Payment</th><th class="right">Total</th><th>Status</th><th></th></tr></thead>
+      <tbody id="orders-body"></tbody>
+    </table>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;flex-wrap:wrap;gap:8px">
+    <span class="muted small" id="page-info"></span>
+    <div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" id="prev-page">← Prev</button><button class="btn btn-ghost btn-sm" id="next-page">Next →</button></div>
+  </div>
+</section>
+
+<div class="modal" id="order-modal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="order-modal-title">
+    <div class="modal-head"><h2 id="order-modal-title">Order</h2><button class="icon-btn modal-close" data-close aria-label="Close">✕</button></div>
+    <div id="order-detail"></div>
+  </div>
+</div>
+{% endblock %}
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/admin/orders.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Book · Online Aklatan{% endblock %}
+{% block content %}
+<div id="book-page" data-book-id="{{ book_id }}"></div>
+
+<div class="card" id="reviews-card" hidden style="margin-top:32px">
+  <div class="card-head"><h2>Reviews</h2><span id="review-summary"></span></div>
+  <form id="review-form" class="no-print" hidden>
+    <div class="field">
+      <label>Your rating</label>
+      <div class="star-input">
+        {% for n in range(5, 0, -1) %}
+        <input type="radio" name="rating" id="star{{ n }}" value="{{ n }}" {% if n == 5 %}checked{% endif %}><label for="star{{ n }}" title="{{ n }} star{{ 's' if n > 1 }}">★</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="field">
+      <label for="review-text">Your review</label>
+      <textarea id="review-text" required maxlength="600" placeholder="What did you think?"></textarea>
+    </div>
+    <button class="btn btn-primary" type="submit">Post review</button>
+    <hr>
+  </form>
+  <p id="review-login" class="muted small" hidden><a href="{{ url_for('login') }}">Log in</a> to write a review.</p>
+  <div id="review-list"></div>
+</div>
+
+<div id="related" hidden>
+  <div class="section-title"><h2>More in <span id="related-genre"></span></h2></div>
+  <div class="book-grid" id="related-grid"></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/shop/book.js') }}"></script>
+{% endblock %}

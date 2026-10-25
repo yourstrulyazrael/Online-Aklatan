@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Online Aklatan{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script id="client-state" type="application/json">{{ client_state }}</script>
+  {% block head %}{% endblock %}
+</head>
+<body {% block body_attrs %}{% endblock %}>
+  {% block layout %}
+  <header class="site-header">
+    <div class="container header-row">
+      <a class="brand" href="{{ url_for('index') }}"><span class="brand-mark">📖</span> Online Aklatan</a>
+      <nav class="nav-links" aria-label="Main">
+        <a href="{{ url_for('index') }}">Shop</a>
+        <a href="{{ url_for('orders') }}">My Orders</a>
+        <a href="{{ url_for('wishlist') }}">Wishlist</a>
+        {% if user and user.role == 'admin' %}<a href="{{ url_for('admin_dashboard') }}">Admin</a>{% endif %}
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" type="button" data-theme-toggle aria-label="Toggle dark mode">◐</button>
+        <a class="icon-btn cart-link" href="{{ url_for('cart') }}" data-cart-link aria-label="Cart">🛒<span class="cart-count" data-cart-count hidden>0</span></a>
+        <div id="user-menu" class="user-menu"></div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    {% block full_width %}{% endblock %}
+    <div class="container">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-row">
+      <span>© 2026 Online Aklatan · Every page, a new world.</span>
+      <span>Pay with Cash on Delivery · GCash · Maya · GrabPay · Visa · Mastercard</span>
+    </div>
+  </footer>
+  {% endblock %}
+
+  <script src="{{ url_for('static', filename='js/store.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/ui.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

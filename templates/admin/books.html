@@ -1,0 +1,121 @@
+{% extends "admin/base.html" %}
+{% block title %}Inventory · Admin{% endblock %}
+{% block content %}
+<div class="admin-top">
+  <div><h1>Inventory</h1><p class="muted" style="margin:0" id="inv-summary"></p></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn btn-ghost" id="export-btn">⬇ Export CSV</button>
+    <button class="btn btn-primary" id="add-btn">＋ Add book</button>
+  </div>
+</div>
+
+<section class="card">
+  <div class="toolbar">
+    <div class="search"><label for="inv-q" class="sr-only">Search inventory</label><input type="search" id="inv-q" placeholder="Search title, author, ISBN…"></div>
+    <label for="inv-genre" class="sr-only">Genre</label>
+    <select id="inv-genre"><option value="">All genres</option></select>
+    <div class="seg" id="inv-stock" role="group" aria-label="Stock filter">
+      <button data-stock="all" class="active">All</button>
+      <button data-stock="low">Low stock</button>
+      <button data-stock="out">Out of stock</button>
+    </div>
+  </div>
+  <p class="drop-hint">🖼️ Tip: drop an image onto any row to change that book's cover.</p>
+  <div class="table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th data-sort="title">Book</th>
+          <th data-sort="genre">Genre</th>
+          <th data-sort="price" class="right">Price</th>
+          <th data-sort="stock">Stock</th>
+          <th data-sort="sold" class="right">Sold</th>
+          <th data-sort="revenue" class="right">Revenue</th>
+          <th class="right">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="inv-body"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Add / edit book -->
+<div class="modal" id="book-modal" hidden>
+  <div class="modal-card modal-lg" role="dialog" aria-modal="true" aria-labelledby="book-modal-title">
+    <div class="modal-head"><h2 id="book-modal-title">Add book</h2><button class="icon-btn modal-close" data-close aria-label="Close">✕</button></div>
+    <form id="book-form" novalidate>
+      <input type="hidden" name="id">
+      <div class="field"><label for="f-title">Title</label><input id="f-title" name="title" required maxlength="120"></div>
+      <div class="grid-2">
+        <div class="field"><label for="f-author">Author</label><input id="f-author" name="author" required maxlength="80"></div>
+        <div class="field"><label for="f-genre">Genre</label><input id="f-genre" name="genre" list="genre-options" required maxlength="40"><datalist id="genre-options"></datalist></div>
+      </div>
+      <div class="grid-3">
+        <div class="field"><label for="f-price">Price (₱)</label><input id="f-price" name="price" type="number" min="1" step="0.01" required></div>
+        <div class="field" id="stock-field"><label for="f-stock">Initial stock</label><input id="f-stock" name="stock" type="number" min="0" step="1" value="10" required></div>
+        <div class="field"><label for="f-year">Year</label><input id="f-year" name="year" type="number" min="1000" max="2100"></div>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label for="f-isbn">ISBN</label><input id="f-isbn" name="isbn" inputmode="numeric" maxlength="17" placeholder="978…"></div>
+        <div class="field"><label for="f-pages">Pages</label><input id="f-pages" name="pages" type="number" min="1"></div>
+      </div>
+      <div class="field">
+        <label for="cover-drop">Cover image <span class="muted">(optional)</span></label>
+        <div class="cover-editor">
+          <div class="cover-editor-preview" id="cover-preview" aria-live="polite"></div>
+          <div>
+            <div class="dropzone" id="cover-drop" tabindex="0" role="button" aria-describedby="cover-drop-help">
+              <div class="dropzone-icon" aria-hidden="true">🖼️</div>
+              <strong>Drag &amp; drop an image, or <span>browse</span></strong>
+              <p class="small muted" id="cover-drop-help">JPG, PNG, WebP or GIF · up to 5 MB · or paste with Ctrl+V</p>
+              <div class="upload-progress" id="cover-progress" hidden><span></span></div>
+            </div>
+            <input type="file" id="cover-file" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
+            <div class="cover-url-row">
+              <label for="f-cover" class="sr-only">Cover image URL</label>
+              <input id="f-cover" name="coverUrl" type="text" placeholder="…or paste an image URL" autocomplete="off">
+              <button type="button" class="btn btn-ghost btn-sm" id="cover-clear">Remove</button>
+            </div>
+          </div>
+        </div>
+        <p class="small muted" style="margin:.4em 0 0">No image? We'll try to find the cover from the ISBN, or show a generated one.</p>
+      </div>
+      <div class="field"><label for="f-desc">Description</label><textarea id="f-desc" name="description" maxlength="1000"></textarea></div>
+      <p class="field-error" id="book-form-error"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" data-close>Cancel</button>
+        <button type="submit" class="btn btn-primary">Save book</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Restock -->
+<div class="modal" id="restock-modal" hidden>
+  <div class="modal-card modal-sm" role="dialog" aria-modal="true" aria-labelledby="restock-title">
+    <div class="modal-head"><h2 id="restock-title">Restock</h2><button class="icon-btn modal-close" data-close aria-label="Close">✕</button></div>
+    <form id="restock-form" novalidate>
+      <p id="restock-book" style="margin-top:0"></p>
+      <div class="field">
+        <label for="r-qty">Quantity to add</label>
+        <input id="r-qty" type="number" min="1" step="1" value="10" required>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <button type="button" class="btn btn-ghost btn-sm" data-qty="10">+10</button>
+          <button type="button" class="btn btn-ghost btn-sm" data-qty="25">+25</button>
+          <button type="button" class="btn btn-ghost btn-sm" data-qty="50">+50</button>
+        </div>
+      </div>
+      <div class="field"><label for="r-note">Note <span class="muted">(supplier, PO #…)</span></label><input id="r-note" maxlength="120"></div>
+      <p class="small muted" id="restock-preview"></p>
+      <p class="field-error" id="restock-error"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" data-close>Cancel</button>
+        <button type="submit" class="btn btn-primary">Add stock</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/admin/books.js') }}"></script>
+{% endblock %}
